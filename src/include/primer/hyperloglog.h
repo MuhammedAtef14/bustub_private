@@ -35,6 +35,13 @@ class HyperLogLog {
   /** @brief Disable default constructor. */
   HyperLogLog() = delete;
 
+  /** @brief Parameterized constructor. */
+  HyperLogLog(int b){
+    this->b=b;
+    size_t m = 1 << b;
+    registers_ = std::vector<int>(m,0); 
+  }
+
   explicit HyperLogLog(int16_t n_bits);
 
   /**
@@ -43,7 +50,8 @@ class HyperLogLog {
    * @returns cardinality value
    */
   auto GetCardinality() { return cardinality_; }
-
+  auto GetB() { return b; }
+  auto GetRegisters() { return registers_; }
   auto AddElem(KeyType val) -> void;
 
   auto ComputeCardinality() -> void;
@@ -73,6 +81,8 @@ class HyperLogLog {
   size_t cardinality_;
 
   /** @todo (student) can add their data structures that support HyperLogLog */
+  std::vector<uint8_t> registers_;
+  int b;
 };
 
 }  // namespace bustub

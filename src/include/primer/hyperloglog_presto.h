@@ -92,6 +92,10 @@ class HyperLogLogPresto {
   uint64_t cardinality_;
 
   // TODO(student) - can add more data structures as required
+  std::vector<uint8_t> registers_;
+  int16_t b;
+  static constexpr int BITSET_CAPACITY = 64;
+  auto CountConsecutiveZeros(const std::bitset<BITSET_CAPACITY> &bset, int start_index) -> uint64_t;
 };
 
 }  // namespace bustub

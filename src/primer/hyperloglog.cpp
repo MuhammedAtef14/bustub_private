@@ -16,7 +16,11 @@ namespace bustub {
 
 /** @brief Parameterized constructor. */
 template <typename KeyType>
-HyperLogLog<KeyType>::HyperLogLog(int16_t n_bits) : cardinality_(0) {}
+HyperLogLog<KeyType>::HyperLogLog(int16_t n_bits) : cardinality_(0) {
+  this->b = n_bits;
+  size_t m = 1 << n_bits;
+  registers_ = std::vector<uint8_t>(m, 0);
+}
 
 /**
  * @brief Function that computes binary.
@@ -26,8 +30,7 @@ HyperLogLog<KeyType>::HyperLogLog(int16_t n_bits) : cardinality_(0) {}
  */
 template <typename KeyType>
 auto HyperLogLog<KeyType>::ComputeBinary(const hash_t &hash) const -> std::bitset<BITSET_CAPACITY> {
-  /** @TODO(student) Implement this function! */
-  return {0};
+  return std::bitset<BITSET_CAPACITY>(hash);
 }
 
 /**
@@ -38,8 +41,16 @@ auto HyperLogLog<KeyType>::ComputeBinary(const hash_t &hash) const -> std::bitse
  */
 template <typename KeyType>
 auto HyperLogLog<KeyType>::PositionOfLeftmostOne(const std::bitset<BITSET_CAPACITY> &bset) const -> uint64_t {
-  /** @TODO(student) Implement this function! */
+  for(int i=BITSET_CAPACITY-1-this->b;i>=0;i--){
+      if(bset[i]){
+
+        return (BITSET_CAPACITY-this->b)-i;
+
+      }
+  }
+
   return 0;
+  // by convention if all bits are zero, return 64
 }
 
 /**
@@ -50,6 +61,19 @@ auto HyperLogLog<KeyType>::PositionOfLeftmostOne(const std::bitset<BITSET_CAPACI
 template <typename KeyType>
 auto HyperLogLog<KeyType>::AddElem(KeyType val) -> void {
   /** @TODO(student) Implement this function! */
+   std :: bitset<BITSET_CAPACITY> bset = ComputeBinary(CalculateHash(val));
+  
+   uint64_t register_index = 0;
+    for (int i = 0; i < this->b; ++i) {
+        if (bset[BITSET_CAPACITY - 1 - i]) {
+            register_index |= (1ULL << (this->b - 1 - i));
+        }
+    }
+   uint64_t p=PositionOfLeftmostOne(bset);
+   
+   auto &registers= this->registers_;
+   registers[register_index]=std::max(registers[register_index],static_cast<uint8_t>(p));
+   
 }
 
 /**
@@ -58,6 +82,14 @@ auto HyperLogLog<KeyType>::AddElem(KeyType val) -> void {
 template <typename KeyType>
 auto HyperLogLog<KeyType>::ComputeCardinality() -> void {
   /** @TODO(student) Implement this function! */
+  int m=this->registers_.size();
+  double sum_of_powers=0;
+  for(int i=0;i<m;i++){
+    sum_of_powers+=pow(2,-1*registers_[i]);
+  }
+
+  this->cardinality_=floor(CONSTANT * m * m / sum_of_powers);
+
 }
 
 template class HyperLogLog<int64_t>;

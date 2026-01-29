@@ -17,9 +17,9 @@ namespace bustub {
 /** @brief Parameterized constructor. */
 template <typename KeyType>
 HyperLogLog<KeyType>::HyperLogLog(int16_t n_bits) : cardinality_(0) {
-  this->b = n_bits;
-  size_t m = 1 << n_bits;
-  registers_ = std::vector<uint8_t>(m, 0);
+  this->b = std::max(static_cast<int16_t>(0), n_bits); // Ensure non-negative
+  size_t m = 1ULL << this->b; 
+  registers_.assign(m, 0);
 }
 
 /**

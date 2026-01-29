@@ -36,11 +36,7 @@ class HyperLogLog {
   HyperLogLog() = delete;
 
   /** @brief Parameterized constructor. */
-  HyperLogLog(int b){
-    this->b=b;
-    size_t m = 1 << b;
-    registers_ = std::vector<int>(m,0); 
-  }
+ 
 
   explicit HyperLogLog(int16_t n_bits);
 
